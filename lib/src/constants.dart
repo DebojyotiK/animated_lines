@@ -1,0 +1,1 @@
+const arrowAspectRatio = 0.7;

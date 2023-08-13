@@ -1,0 +1,12 @@
+name: animated_lines
+description: Draws animated lines between two points
+version: 1.0.0
+repository: https://github.com/DebojyotiK/animated_lines.git
+
+environment:
+  sdk: '>=3.0.6 <4.0.0'
+  flutter: ">=1.17.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
