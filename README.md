@@ -1,6 +1,6 @@
 Draws Animated Curved and Straight Lines between two points.
 
-![Demo](animation.gif)
+![Demo](https://raw.githubusercontent.com/DebojyotiK/animated_lines/main/animation.gif)
 
 ## Usage
 

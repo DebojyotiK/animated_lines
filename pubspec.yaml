@@ -1,6 +1,6 @@
 name: animated_lines
-description: Draws animated lines between two points
-version: 1.0.0
+description: Draws animated lines between two points.Supports both straight lines as well as curved lines with a given radius.
+version: 1.0.1
 repository: https://github.com/DebojyotiK/animated_lines.git
 
 environment:
