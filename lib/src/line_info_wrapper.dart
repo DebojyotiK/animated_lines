@@ -17,6 +17,7 @@ class LineInfoWrapper extends ChangeNotifier {
   final StrokeStyle strokeStyle;
   final double strokeWidth;
   bool _isAnimating = false;
+  bool get isAnimating => _isAnimating;
   VoidCallback? _onComplete;
 
   late double _progress;
@@ -76,7 +77,7 @@ class LineInfoWrapper extends ChangeNotifier {
   }
 
   void _updateProgressListener() {
-    updateProgress(_progressAnimation.value);
+    setProgress(_progressAnimation.value);
   }
 
   void _statusListener(AnimationStatus status) {
@@ -110,7 +111,7 @@ class LineInfoWrapper extends ChangeNotifier {
     animationController.stop(canceled: false);
   }
 
-  void updateProgress(double value) {
+  void setProgress(double value) {
     bool shouldNotify = _progress != value;
     if (shouldNotify) {
       _progress = value;
@@ -119,6 +120,7 @@ class LineInfoWrapper extends ChangeNotifier {
   }
 
   void dispose(){
+    super.dispose();
     stopAnimation();
     animationController.removeStatusListener(_statusListener);
     animationController.removeListener(_updateProgressListener);
