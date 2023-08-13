@@ -1,5 +1,7 @@
 Draws Animated Curved and Straight Lines between two points.
 
+![Demo](animation.gif)
+
 ## Usage
 
 **Creating a Curved Line**
