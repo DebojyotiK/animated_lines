@@ -12,4 +12,16 @@ class StrokeStyle {
     this.dashLength = 5,
     this.gapLength = 5,
   }) : isPlain = false;
+
+  @override
+  bool operator ==(Object other) {
+    return other is StrokeStyle &&
+        other.runtimeType == runtimeType &&
+        other.isPlain == isPlain &&
+        other.dashLength == dashLength &&
+        other.gapLength == gapLength;
+  }
+
+  @override
+  int get hashCode => super.hashCode;
 }

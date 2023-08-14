@@ -53,7 +53,7 @@ class SingleArchedLinePainter implements SingleLinePainter {
 
   @override
   Duration animationDuration() {
-    int duration = _distanceBetweenPoints * 15000 ~/ 1024;
+    int duration = (_distanceBetweenPoints * durationFactorInMS).round();
     return Duration(milliseconds: duration);
   }
 

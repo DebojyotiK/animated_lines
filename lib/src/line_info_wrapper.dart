@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'constants.dart';
 import 'line_style.dart';
 import 'single_arched_line_painter.dart';
 import 'single_line_painter.dart';
@@ -11,7 +12,7 @@ class LineInfoWrapper extends ChangeNotifier {
   final Offset destination;
   final Color backgroundLineColor;
   final Color progressLineColor;
-  final AnimationController animationController;
+  AnimationController? _animationController;
   final int animationCount;
   final LineStyle lineStyle;
   final StrokeStyle strokeStyle;
@@ -41,22 +42,24 @@ class LineInfoWrapper extends ChangeNotifier {
     required this.destination,
     required this.backgroundLineColor,
     required this.progressLineColor,
-    required this.animationController,
+    required AnimationController animationController,
     required this.animationCount,
     required this.strokeWidth,
     required this.showArrow,
     required this.lineStyle,
     required this.strokeStyle,
-    required double progress,
     required double defaultRadius,
-  }) : _progress = progress {
-    if(lineStyle.isCurved){
+    double progress = 0,
+    bool isAnimating = false,
+  })  : _progress = progress,
+        _isAnimating = isAnimating,
+        _animationController = animationController {
+    if (lineStyle.isCurved) {
       _painter = SingleArchedLinePainter(
         this,
         defaultRadius,
       );
-    }
-    else{
+    } else {
       _painter = SingleStraightLinePainter(this);
     }
     _initializeAnimation();
@@ -64,11 +67,11 @@ class LineInfoWrapper extends ChangeNotifier {
 
   void _initializeAnimation() {
     _progressAnimation = Tween(
-      begin: 0.0,
-      end: 1.5,
+      begin: MIN_VALUE,
+      end: MAX_VALUE,
     ).animate(
       CurvedAnimation(
-        parent: animationController,
+        parent: _animationController!,
         curve: Curves.linear,
       ),
     )
@@ -83,47 +86,70 @@ class LineInfoWrapper extends ChangeNotifier {
   void _statusListener(AnimationStatus status) {
     if (status == AnimationStatus.completed) {
       if (animationCount < 0) {
-        animationController.forward(from: 0);
+        _configureDurationAndReplay(_painter.animationDuration(), 0);
       } else if (_animationCount < animationCount - 1) {
-        animationController.forward(from: 0);
         _animationCount++;
+        _configureDurationAndReplay(_painter.animationDuration(), 0);
       } else {
         _isAnimating = false;
         if (_onComplete != null) {
           _onComplete!();
         }
       }
-    } else if (status == AnimationStatus.dismissed) {
-      _isAnimating = false;
     }
   }
 
+  void _configureDurationAndReplay(
+    Duration duration,
+    double minValue,
+  ) {
+    _animationController?.duration = duration;
+    _animationController?.forward(from: minValue);
+  }
 
-  void animate({VoidCallback? onComplete}) {
+  void animate({
+    VoidCallback? onComplete,
+  }) {
     _onComplete = onComplete;
     _isAnimating = true;
-    _animationCount = 0;
-    animationController.duration = _painter.animationDuration();
-    animationController.forward(from: 0);
+    double totalSpan = (MAX_VALUE - MIN_VALUE);
+    double fromValue = (_progress - MIN_VALUE) / totalSpan;
+    Duration totalDuration = _painter.animationDuration();
+    Duration remainingDuration = totalDuration * ((MAX_VALUE - progress) / totalSpan);
+    _configureDurationAndReplay(
+      remainingDuration,
+      fromValue,
+    );
   }
 
   void stopAnimation() {
-    animationController.stop(canceled: false);
+    _isAnimating = false;
+    _animationController?.stop(canceled: false);
+  }
+
+  void resetAnimation() {
+    stopAnimation();
+    _progress = MIN_VALUE;
   }
 
   void setProgress(double value) {
     bool shouldNotify = _progress != value;
     if (shouldNotify) {
       _progress = value;
-      notifyListeners();
+      if(hasListeners){
+        notifyListeners();
+      }
     }
   }
 
   void dispose(){
     super.dispose();
+    bool isAnimating = _isAnimating;
     stopAnimation();
-    animationController.removeStatusListener(_statusListener);
-    animationController.removeListener(_updateProgressListener);
-    animationController.dispose();
+    _isAnimating = isAnimating;
+    _animationController?.removeStatusListener(_statusListener);
+    _animationController?.removeListener(_updateProgressListener);
+    _animationController?.dispose();
+    _animationController = null;
   }
 }

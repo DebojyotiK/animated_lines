@@ -58,7 +58,7 @@ class _AnimatedLinesContainerState extends State<AnimatedLinesContainer> with Ti
     List<LineInfoWrapper> wrappers = [];
     for (var e in widget.lines) {
       LineInfoWrapper? wrapper = e.getWrapper();
-      if (wrapper != null) {
+      if (wrapper != null && !e.needRebuild) {
         wrappers.add(wrapper);
       }
     }
@@ -78,6 +78,10 @@ class _AnimatedLinesContainerState extends State<AnimatedLinesContainer> with Ti
       if (!currentLines.contains(e)) {
         _destroyWrapper(e);
       }
+      else if(e.needRebuild){
+        _destroyWrapper(e);
+        _initWrapper(e);
+      }
     }
     super.didUpdateWidget(oldWidget);
   }
@@ -91,11 +95,19 @@ class _AnimatedLinesContainerState extends State<AnimatedLinesContainer> with Ti
   }
 
   void _initWrapper(LineInfo e) {
-    e.createWrapper(
+    LineInfoWrapper? wrapper = e.getWrapper();
+    bool wasAnimatingBefore = wrapper?.isAnimating ?? false;
+    double progress = wrapper?.progress ?? 0;
+    wrapper = e.createWrapper(
       AnimationController(vsync: this),
       _maxRadius,
+      wasAnimatingBefore,
+      progress,
     );
-    e.getWrapper()?.addListener(_refreshView);
+    wrapper.addListener(_refreshView);
+    if (wasAnimatingBefore) {
+      e.animate();
+    }
   }
 
   void _destroyWrapper(LineInfo e) {

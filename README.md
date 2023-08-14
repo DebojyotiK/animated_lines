@@ -64,9 +64,23 @@ providing `animationCount < 0` while creating line object denotes animation to c
 line.stopAnimation();
 ```  
 
+**Resetting animation**
+```dart  
+line.resetAnimation();
+```  
+
 **Listening to animation end**
 ```dart  
 line.onAnimationComplete = () {  
   //TODO: Execute Code On animation end  
 };
+```
+
+**Properties of LineInfo Object can be updated as**
+```dart  
+line.update(
+   source: const Offset(2, 5),
+   backgroundLineColor: Colors.blue,
+   progress: 0.2,
+);
 ```

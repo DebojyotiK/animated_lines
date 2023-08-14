@@ -12,4 +12,16 @@ class LineStyle {
       : isCurved = false,
         isClockwise = false,
         this.radius = null;
+
+  @override
+  bool operator ==(Object other) {
+    return other is LineStyle &&
+        other.runtimeType == runtimeType &&
+        other.isCurved == isCurved &&
+        other.isClockwise == isClockwise &&
+        other.radius == radius;
+  }
+
+  @override
+  int get hashCode => super.hashCode;
 }
